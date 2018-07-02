@@ -8,9 +8,6 @@ var messages = [
 ];
 
 var requestHandler = function(request, response) {
-  // console.log(
-  //   'Serving request type ' + request.method + ' for url ' + request.url
-  // );
 
   var statusCode = 200;
 
@@ -21,6 +18,9 @@ var requestHandler = function(request, response) {
   response.writeHead(statusCode, headers);
 
   if (request.method === 'GET') {
+    messages.sort(function(m1, m2) {
+      return m2.createdAt - m1.createdAt;
+    });
     response.end(JSON.stringify({ results: messages }));
   } else if (request.method === 'POST') {
     var message = '';
@@ -30,7 +30,6 @@ var requestHandler = function(request, response) {
     request.on('end', function() {
       message = JSON.parse(message);
       message.createdAt = new Date();
-      debugger;
       messages.push(message);
     });
     response.end('{"success": "Updated Successfully", "status": 200}');

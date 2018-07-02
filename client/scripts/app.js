@@ -4,7 +4,7 @@ var app = {
   server: 'http://127.0.0.1:3000/',
   username: 'anonymous',
   roomname: 'lobby',
-  lastMessageId: 0,
+  lastMessageCreatedAt: new Date(),
   friends: {},
   messages: [],
 
@@ -58,7 +58,7 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'GET',
-      data: { order: '-createdAt' },
+      // data: { order: '-createdAt' },
       success: function(data) {
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) {
@@ -69,10 +69,10 @@ var app = {
         app.messages = data.results;
 
         // Get the last message
-        var mostRecentMessage = data.results[data.results.length - 1];
+        var mostRecentMessage = data.results[0];
 
         // Only bother updating the DOM if we have a new message
-        if (mostRecentMessage.objectId !== app.lastMessageId) {
+        if (mostRecentMessage.createdAt !== app.lastMessageCreatedAt) {
           // Update the UI with the fetched rooms
           app.renderRoomList(data.results);
 
@@ -80,7 +80,7 @@ var app = {
           app.renderMessages(data.results, animate);
 
           // Store the ID of the most recent message
-          app.lastMessageId = mostRecentMessage.objectId;
+          app.lastMessageCreatedAt = mostRecentMessage.createdAt;
         }
       },
       error: function(error) {
