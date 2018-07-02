@@ -2,7 +2,8 @@ var messages = [
   {
     username: 'anonymous',
     text: 'Hello, world!',
-    roomname: 'lobby'
+    roomname: 'lobby',
+    createdAt: new Date()
   }
 ];
 
@@ -22,11 +23,21 @@ var requestHandler = function(request, response) {
   if (request.method === 'GET') {
     response.end(JSON.stringify({ results: messages }));
   } else if (request.method === 'POST') {
-    // messages.push(request.body);
+    var message = '';
+    request.on('data', function(chunk) { 
+      message += chunk; 
+    });
+    request.on('end', function() {
+      message = JSON.parse(message);
+      message.createdAt = new Date();
+      debugger;
+      messages.push(message);
+    });
+    response.end('{"success": "Updated Successfully", "status": 200}');
+  } else {
     response.end();
   }
 
-  response.end();
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -45,4 +56,4 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
-exports.handler = requestHandler;
+exports.handleRequest = requestHandler;
