@@ -1,14 +1,15 @@
-var messages = [{ 
-  username: 'anonymous',
-  text: 'Hello, world!',
-  roomname: 'lobby' 
-}];
+var messages = [
+  {
+    username: 'anonymous',
+    text: 'Hello, world!',
+    roomname: 'lobby'
+  }
+];
 
-var requestHandler = function(request, response) {  
-
-  if (request.method === 'OPTIONS')
-    console.log(request);
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
+var requestHandler = function(request, response) {
+  // console.log(
+  //   'Serving request type ' + request.method + ' for url ' + request.url
+  // );
 
   var statusCode = 200;
 
@@ -21,7 +22,7 @@ var requestHandler = function(request, response) {
   if (request.method === 'GET') {
     response.end(JSON.stringify({ results: messages }));
   } else if (request.method === 'POST') {
-    // messages.push(request.data);
+    messages.push(request.body);
     response.end(request.body);
   }
 };
