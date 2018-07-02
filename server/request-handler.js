@@ -22,9 +22,11 @@ var requestHandler = function(request, response) {
   if (request.method === 'GET') {
     response.end(JSON.stringify({ results: messages }));
   } else if (request.method === 'POST') {
-    messages.push(request.body);
-    response.end(request.body);
+    // messages.push(request.body);
+    response.end();
   }
+
+  response.end();
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
