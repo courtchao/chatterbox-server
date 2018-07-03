@@ -10,7 +10,7 @@ var messages = [
 var endpointURL = '/classes/messages';
 
 var requestHandler = function(request, response) {
-  var statusCode = 400;
+  var statusCode;
   var responseObj = {};
   
   var headers = defaultCorsHeaders;
@@ -41,6 +41,11 @@ var requestHandler = function(request, response) {
       messages.push(message);
     });
   } 
+
+  else {
+    statusCode = 405;
+    responseObj.message = 'This endpoint only supports GET and POST requests';
+  }
 
   responseObj.status = statusCode;
   response.writeHead(statusCode, headers);

@@ -101,7 +101,6 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-
   it('Should 404 when asked for a nonexistent file', function() {
     var req = new stubs.request('/arglebargle', 'GET');
     var res = new stubs.response();
@@ -114,6 +113,81 @@ describe('Node Server Request Listener Function', function() {
       function() {
         expect(res._responseCode).to.equal(404);
       });
+  });
+
+  it('Should 405 when request method is not GET or POST', function() {
+    var req = new stubs.request('/classes/messages', 'OPTIONS');
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    // Wait for response to return and then check status code
+    waitForThen(
+      function() { return res._ended; },
+      function() {
+        expect(res._responseCode).to.equal(405);
+      });
+  });
+
+  it('Should respond with multiple messages when multiple messages have been posted', function() {
+    var stubMsg1 = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+    var stubMsg2 = {
+      username: 'Mr. Burns',
+      text: 'Excellent'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg1);
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg2);
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    // Now if we request the log, there should be 2 messages:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length).to.be.above(1);
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should return the messages ordered by time created', function() {
+    var stubMsg1 = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+    var stubMsg2 = {
+      username: 'Mr. Burns',
+      text: 'Excellent'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg1);
+    var res = new stubs.response();
+    handler.requestHandler(req, res);
+
+    setTimeout(function() {
+      var req = new stubs.request('/classes/messages', 'POST', stubMsg2);
+      var res = new stubs.response();
+      handler.requestHandler(req, res);
+      // Now if we request the log, there should be 2 messages:
+      req = new stubs.request('/classes/messages', 'GET');
+      res = new stubs.response();
+
+      handler.requestHandler(req, res);
+
+      expect(res._responseCode).to.equal(200);
+      var messages = JSON.parse(res._data).results;
+      expect(messages[0].username).to.equal(stubMsg2.username);
+      expect(res._ended).to.equal(true);
+      done();
+    }, 1000);
+
   });
 
 });
