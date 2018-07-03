@@ -7,22 +7,30 @@ var messages = [
   }
 ];
 
+var endpointURL = '/classes/messages';
+
 var requestHandler = function(request, response) {
-
-  var statusCode = 200;
-
+  var statusCode = 400;
+  var responseObj = {};
+  
   var headers = defaultCorsHeaders;
 
   headers['Content-Type'] = 'application/json';
+   
+  if (request.url !== endpointURL) {
+    statusCode = 404;
+  } 
 
-  response.writeHead(statusCode, headers);
-
-  if (request.method === 'GET') {
+  else if (request.method === 'GET') {
+    statusCode = 200;
     messages.sort(function(m1, m2) {
       return m2.createdAt - m1.createdAt;
     });
-    response.end(JSON.stringify({ results: messages }));
-  } else if (request.method === 'POST') {
+    responseObj.results = messages;
+  } 
+
+  else if (request.method === 'POST') {
+    statusCode = 201;
     var message = '';
     request.on('data', function(chunk) { 
       message += chunk; 
@@ -32,10 +40,11 @@ var requestHandler = function(request, response) {
       message.createdAt = new Date();
       messages.push(message);
     });
-    response.end('{"success": "Updated Successfully", "status": 200}');
-  } else {
-    response.end();
-  }
+  } 
+
+  responseObj.status = statusCode;
+  response.writeHead(statusCode, headers);
+  response.end(JSON.stringify(responseObj));
 
 };
 
@@ -55,4 +64,4 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
-exports.handleRequest = requestHandler;
+exports.requestHandler = requestHandler;
