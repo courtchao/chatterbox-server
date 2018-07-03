@@ -57,7 +57,7 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'GET',
-      // data: { order: '-createdAt' },
+      data: { order: '-createdAt', type: 'fun' },
       success: function(data) {
         // Don't bother if we have nothing to work with
         if (!data.results || !data.results.length) {

@@ -1,3 +1,5 @@
+var url = require('url');
+
 var messages = [
   {
     username: 'anonymous',
@@ -7,17 +9,18 @@ var messages = [
   }
 ];
 
-var endpointURL = '/classes/messages';
+var path = '/classes/messages';
 
 var requestHandler = function(request, response) {
   var statusCode;
   var responseObj = {};
-  
+  debugger;
+  var requestUrl = url.parse(request.url);
   var headers = defaultCorsHeaders;
 
   headers['Content-Type'] = 'application/json';
    
-  if (request.url !== endpointURL) {
+  if (requestUrl.pathname !== path) {
     statusCode = 404;
   } 
 

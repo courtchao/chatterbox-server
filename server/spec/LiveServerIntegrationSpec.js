@@ -73,5 +73,12 @@ describe('server', function() {
     });
   });
 
+  it('should respond to GET requests with search parameters, e.g., /classes/messages?order=createdAt', function(done) {
+    request('http://127.0.0.1:3000/classes/messages?order=createdAt', function(error, response, body) {
+      expect(response.statusCode).to.equal(200);
+      done();
+    });
+  });
+
 
 });
